@@ -1,6 +1,14 @@
 version: 1
 stack: infra
 
+environments:
+  # An env must say where it comes from, or stackr does not make it.
+  # branch: master = it follows this repo's master branch.
+  # auto: false = a push makes a release; it deploys when you promote it.
+  prod:
+    branch: master
+    auto: false
+
 # The shared Postgres. Apps in other stacks get their own database on it
 # with a slice tile: provision_from: infra:prod:pg
 base:
@@ -11,6 +19,3 @@ base:
       pitr_days: 7
       allow:
         - homelab:*            # any stack of this org may cut a slice
-
-environments:
-  prod: {}

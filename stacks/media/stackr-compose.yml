@@ -1,6 +1,14 @@
 version: 1
 stack: media
 
+environments:
+  # An env must say where it comes from, or stackr does not make it.
+  # branch: master = it follows this repo's master branch.
+  # auto: false = a push makes a release; it deploys when you promote it.
+  prod:
+    branch: master
+    auto: false
+
 # Ported from serverconfig/stacks/media/docker-compose.yml.
 # Tile names equal the old container names: the tools' carried-over
 # settings reach each other by those names (http://sonarr:8989 and so on).
@@ -166,6 +174,3 @@ base:
         BAZARR_API_KEY: ${{ params.keys.bazarr }}
         RDT_USER: ${{ params.keys.rdt_user }}
         RDT_PASS: ${{ params.keys.rdt_pass }}
-
-environments:
-  prod: {}
