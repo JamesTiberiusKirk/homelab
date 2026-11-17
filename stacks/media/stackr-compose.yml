@@ -167,6 +167,8 @@ base:
       trigger: manual
       build:
         context: stacks/media/bootstrap
+        # counted from the repo root, not from the context folder
+        dockerfile: stacks/media/bootstrap/Dockerfile
       env:
         SONARR_API_KEY: ${{ params.keys.sonarr }}
         RADARR_API_KEY: ${{ params.keys.radarr }}
