@@ -1,0 +1,25 @@
+trashGuideUrl: https://github.com/TRaSH-Guides/Guides
+recyclarrConfigUrl: https://github.com/recyclarr/config-templates
+# upstream master dropped legacy includes/ in recyclarr v8; pin to last commit that has them
+recyclarrRevision: 4ae377bb704fc7fd69a544ad04e91357e0b09f62
+
+sonarr:
+  series:
+    base_url: http://sonarr:8989
+    api_key: !env SONARR_API_KEY
+    quality_definition:
+      type: series
+    include:
+      - template: sonarr-quality-definition-series
+      - template: sonarr-v4-quality-profile-web-1080p
+      - template: sonarr-v4-custom-formats-web-1080p
+
+radarr:
+  movies:
+    base_url: http://radarr:7878
+    api_key: !env RADARR_API_KEY
+    quality_definition:
+      type: movie
+    include:
+      - template: d1d310673359205736b4b84acd5ea8c8 # Remux 2160p (Combined): 2160p preferred, 1080p fallback
+        source: TRASH

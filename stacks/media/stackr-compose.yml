@@ -1,0 +1,171 @@
+version: 1
+stack: media
+
+# Ported from serverconfig/stacks/media/docker-compose.yml.
+# Tile names equal the old container names: the tools' carried-over
+# settings reach each other by those names (http://sonarr:8989 and so on).
+
+params:
+  # the password gate in front of the five tools (was Authelia)
+  gate:
+    prod:
+      user: darthvader
+      password: {type: secret}
+  # ids the linuxserver images run as; must be able to write the NAS shares
+  ids:
+    prod:
+      puid: "3000"             # darthvader on TrueNAS
+      pgid: "CONFIRM"          # CONFIRM: gid of the media group on TrueNAS
+  keys:
+    prod:
+      sonarr: {type: secret}
+      radarr: {type: secret}
+      prowlarr: {type: secret}
+      bazarr: {type: secret}
+      rdt_user: {type: secret}
+      rdt_pass: {type: secret}
+
+volumes:
+  jellyfin-config: {}
+  jellyfin-cache: {}
+  prowlarr-config: {}
+  sonarr-config: {}
+  radarr-config: {}
+  bazarr-config: {}
+  rdt-db: {}
+  zilean-data: {}
+  configarr-repos: {}
+  configarr-cfs: {}
+
+base:
+  tiles:
+    jellyfin:
+      image: jellyfin/jellyfin
+      port: 8096
+      devices:
+        - /dev/dri/renderD128          # GPU for transcoding; needs a host grant
+      env:
+        JELLYFIN_PublishedServerUrl: https://jf.vulpe.dev
+      volumes:
+        - jellyfin-config:/config
+        - jellyfin-cache:/cache
+        - share:media:/media
+      domains:
+        - host: jf.vulpe.dev           # no gate: Jellyfin has its own login
+
+    prowlarr:
+      image: lscr.io/linuxserver/prowlarr:latest
+      port: 9696
+      env: &lsio
+        PUID: ${{ params.ids.puid }}
+        PGID: ${{ params.ids.pgid }}
+        TZ: Europe/London
+      volumes:
+        - prowlarr-config:/config
+      domains:
+        - host: prowlarr.vulpe.dev
+          proxy: &gate
+            basic_auth:
+              user: ${{ params.gate.user }}
+              password: ${{ params.gate.password }}
+
+    sonarr:
+      image: lscr.io/linuxserver/sonarr:latest
+      port: 8989
+      env: *lsio
+      volumes:
+        - sonarr-config:/config
+        - share:media:/media
+        - share:downloads:/downloads
+      domains:
+        - host: sonarr.vulpe.dev
+          proxy: *gate
+
+    radarr:
+      image: lscr.io/linuxserver/radarr:latest
+      port: 7878
+      env: *lsio
+      volumes:
+        - radarr-config:/config
+        - share:media:/media
+        - share:downloads:/downloads
+      domains:
+        - host: radarr.vulpe.dev
+          proxy: *gate
+
+    bazarr:
+      image: lscr.io/linuxserver/bazarr:latest
+      port: 6767
+      env: *lsio
+      volumes:
+        - bazarr-config:/config
+        - share:media:/media
+      domains:
+        - host: bazarr.vulpe.dev
+          proxy: *gate
+
+    flaresolverr:
+      image: ghcr.io/flaresolverr/flaresolverr:latest
+      env:
+        LOG_LEVEL: info
+        TZ: Europe/London
+
+    rdt-client:
+      image: rogerfar/rdtclient:latest
+      port: 6500
+      env: *lsio
+      volumes:
+        - rdt-db:/data/db
+        - share:downloads:/data/downloads
+      domains:
+        - host: rdt.vulpe.dev
+          proxy: *gate
+
+    # Zilean's database on the shared Postgres 18 (was its own postgres:17).
+    # Starts empty: Zilean downloads its index again.
+    zilean-db:
+      type: slice
+      provision_from: postgres:prod:pg
+
+    zilean:
+      image: ipromknight/zilean:latest
+      env:
+        Zilean__Database__ConnectionString: "Host=${{ tile.zilean-db.host }};Port=${{ tile.zilean-db.port }};Database=${{ tile.zilean-db.database }};Username=${{ tile.zilean-db.user }};Password=${{ tile.zilean-db.password }};Timeout=30;CommandTimeout=3600;"
+        Zilean__Imdb__EnableImportMatching: "false"
+      volumes:
+        - zilean-data:/app/data
+
+    # Pushes the quality profiles in configarr/config.yml into Sonarr and
+    # Radarr. Run by hand. The old configarr-init container is gone: the
+    # two keys come in as env and config.yml reads them with !env.
+    configarr:
+      type: function
+      trigger: manual
+      image: ghcr.io/raydak-labs/configarr:latest
+      env:
+        TZ: Europe/London
+        SONARR_API_KEY: ${{ params.keys.sonarr }}
+        RADARR_API_KEY: ${{ params.keys.radarr }}
+      files:
+        - stacks/media/configarr/config.yml:/app/config/config.yml
+      volumes:
+        - configarr-repos:/app/repos
+        - configarr-cfs:/app/cfs
+
+    # Wires the tools together on a fresh install. Not needed after the
+    # data move; kept as a hand-run function.
+    media-bootstrap:
+      type: function
+      trigger: manual
+      build:
+        context: stacks/media/bootstrap
+      env:
+        SONARR_API_KEY: ${{ params.keys.sonarr }}
+        RADARR_API_KEY: ${{ params.keys.radarr }}
+        PROWLARR_API_KEY: ${{ params.keys.prowlarr }}
+        BAZARR_API_KEY: ${{ params.keys.bazarr }}
+        RDT_USER: ${{ params.keys.rdt_user }}
+        RDT_PASS: ${{ params.keys.rdt_pass }}
+
+environments:
+  prod: {}

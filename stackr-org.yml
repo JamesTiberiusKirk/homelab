@@ -1,0 +1,27 @@
+version: 1
+org: homelab
+
+# Where the org's envs run unless a stack says otherwise.
+pin: media                     # the placement on home-ct
+
+# The old addresses stay: apps keep their vulpe.dev names.
+domains:
+  - host: vulpe.dev
+
+# NAS exports the tiles mount. Off until the NFS exports are confirmed;
+# comes back together with the media stack.
+# shares:
+#   media:
+#     kind: nfs
+#     source: 192.168.1.102:/mnt/tank/media
+#   downloads:
+#     kind: nfs
+#     source: 192.168.1.102:/mnt/tank/downloads
+
+# One file per stack, all in this repo.
+stacks:
+  postgres:
+    path: stacks/postgres/stackr-compose.yml
+  # Second round: needs the shares above and the media group id.
+  # media:
+  #   path: stacks/media/stackr-compose.yml

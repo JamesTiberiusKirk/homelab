@@ -1,0 +1,24 @@
+version: 1
+
+# Forwards to machines outside stackr. Ported from the old Traefik
+# (serverconfig/stacks/traefik/dynamic). This block is the whole list:
+# a route not named here shows as a removal in the plan.
+#
+# Not here yet: nas.vulpe.dev and s3-console.vulpe.dev. They sit behind
+# Authelia on the old Traefik and a stackr route has no login step.
+routes:
+  # Proxmox web UI, self-signed certificate on the host
+  - host: vms.vulpe.dev
+    mode: https
+    target: 192.168.1.99:8006
+    insecure: true
+
+  # RustFS S3 API on TrueNAS. No login in front: clients sign requests.
+  - host: s3.vulpe.dev
+    mode: http
+    target: 192.168.1.102:30292
+
+  # Pi-hole admin, until Pi-hole moves into stackr
+  - host: pihole.vulpe.dev
+    mode: http
+    target: 192.168.1.101:80

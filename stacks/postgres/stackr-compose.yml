@@ -1,0 +1,16 @@
+version: 1
+stack: postgres
+
+# The shared Postgres. Apps in other stacks get their own database on it
+# with a slice tile: provision_from: postgres:prod:pg
+base:
+  tiles:
+    pg:
+      engine: postgres
+      major: 18
+      pitr_days: 7
+      allow:
+        - homelab:*            # any stack of this org may cut a slice
+
+environments:
+  prod: {}
