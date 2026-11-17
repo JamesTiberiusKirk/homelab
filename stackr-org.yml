@@ -13,9 +13,11 @@ shares:
   media:
     kind: nfs
     source: 192.168.1.102:/mnt/tank/media
+    options: nfsvers=4.2   # NFS 3 needs helper services on the node that it does not run
   downloads:
     kind: nfs
     source: 192.168.1.102:/mnt/tank/downloads
+    options: nfsvers=4.2   # NFS 3 needs helper services on the node that it does not run
 
 # One file per stack, all in this repo.
 stacks:
