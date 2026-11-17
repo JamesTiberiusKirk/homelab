@@ -20,8 +20,8 @@ domains:
 
 # One file per stack, all in this repo.
 stacks:
-  postgres:
-    path: stacks/postgres/stackr-compose.yml
+  infra:
+    path: stacks/infra/stackr-compose.yml
   # Second round: needs the shares above and the media group id.
   # media:
   #   path: stacks/media/stackr-compose.yml

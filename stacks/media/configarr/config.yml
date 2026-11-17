@@ -5,7 +5,7 @@ recyclarrRevision: 4ae377bb704fc7fd69a544ad04e91357e0b09f62
 
 sonarr:
   series:
-    base_url: http://sonarr:8989
+    base_url: ${{ tile.sonarr.url }}
     api_key: !env SONARR_API_KEY
     quality_definition:
       type: series
@@ -16,7 +16,7 @@ sonarr:
 
 radarr:
   movies:
-    base_url: http://radarr:7878
+    base_url: ${{ tile.radarr.url }}
     api_key: !env RADARR_API_KEY
     quality_definition:
       type: movie

@@ -15,7 +15,7 @@ params:
   ids:
     prod:
       puid: "3000"             # darthvader on TrueNAS
-      pgid: "CONFIRM"          # CONFIRM: gid of the media group on TrueNAS
+      pgid: "1000"             # the media group on TrueNAS, owns tank/media and tank/downloads
   keys:
     prod:
       sonarr: {type: secret}
@@ -125,7 +125,7 @@ base:
     # Starts empty: Zilean downloads its index again.
     zilean-db:
       type: slice
-      provision_from: postgres:prod:pg
+      provision_from: infra:prod:pg
 
     zilean:
       image: ipromknight/zilean:latest
@@ -147,7 +147,7 @@ base:
         SONARR_API_KEY: ${{ params.keys.sonarr }}
         RADARR_API_KEY: ${{ params.keys.radarr }}
       files:
-        - stacks/media/configarr/config.yml:/app/config/config.yml
+        - stacks/media/configarr/config.yml:/app/config/config.yml:template
       volumes:
         - configarr-repos:/app/repos
         - configarr-cfs:/app/cfs

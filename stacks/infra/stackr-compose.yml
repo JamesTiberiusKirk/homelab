@@ -1,8 +1,8 @@
 version: 1
-stack: postgres
+stack: infra
 
 # The shared Postgres. Apps in other stacks get their own database on it
-# with a slice tile: provision_from: postgres:prod:pg
+# with a slice tile: provision_from: infra:prod:pg
 base:
   tiles:
     pg:
