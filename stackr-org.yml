@@ -8,20 +8,18 @@ pin: media                     # the placement on home-ct
 domains:
   - host: vulpe.dev
 
-# NAS exports the tiles mount. Off until the NFS exports are confirmed;
-# comes back together with the media stack.
-# shares:
-#   media:
-#     kind: nfs
-#     source: 192.168.1.102:/mnt/tank/media
-#   downloads:
-#     kind: nfs
-#     source: 192.168.1.102:/mnt/tank/downloads
+# NAS exports the tiles mount. TrueNAS allows the home node (192.168.1.104).
+shares:
+  media:
+    kind: nfs
+    source: 192.168.1.102:/mnt/tank/media
+  downloads:
+    kind: nfs
+    source: 192.168.1.102:/mnt/tank/downloads
 
 # One file per stack, all in this repo.
 stacks:
   infra:
     path: stacks/infra/stackr-compose.yml
-  # Second round: needs the shares above and the media group id.
-  # media:
-  #   path: stacks/media/stackr-compose.yml
+  media:
+    path: stacks/media/stackr-compose.yml
