@@ -4,8 +4,8 @@ version: 1
 # (serverconfig/stacks/traefik/dynamic). This block is the whole list:
 # a route not named here shows as a removal in the plan.
 #
-# Not here yet: nas.vulpe.dev and s3-console.vulpe.dev. They sit behind
-# Authelia on the old Traefik and a stackr route has no login step.
+# nas and s3-console sat behind Authelia on the old Traefik. A stackr route
+# has no login step yet, so for now only their own login pages protect them.
 routes:
   # Proxmox web UI, self-signed certificate on the host
   - host: vms.vulpe.dev
@@ -23,3 +23,12 @@ routes:
     mode: http
     target: 192.168.1.101:80
 
+  # TrueNAS web UI. NO login in front (was Authelia): only TrueNAS's own.
+  - host: nas.vulpe.dev
+    mode: http
+    target: 192.168.1.102:80
+
+  # RustFS console on TrueNAS. NO login in front (was Authelia): only its own.
+  - host: s3-console.vulpe.dev
+    mode: http
+    target: 192.168.1.102:30293
