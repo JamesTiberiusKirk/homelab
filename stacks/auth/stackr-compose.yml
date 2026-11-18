@@ -70,7 +70,7 @@ base:
       port: 9091
       user: "1000:1000"
       depends_on:
-        - lldap
+        - lldap:healthy   # waits for its health check, not just its start
       env:
         TZ: Europe/London
         # Authelia fills in the {{ env "..." }} parts of its config itself,
