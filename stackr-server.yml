@@ -22,10 +22,3 @@ routes:
   - host: pihole.vulpe.dev
     mode: http
     target: 192.168.1.101:80
-
-  # TEMPORARY, until Immich runs on stackr: passed through untouched to the
-  # old VM's Traefik, which keeps its own certificate for the name. Take it
-  # out at the Immich move; pics.vulpe.dev then goes to the new tile.
-  - host: pics.vulpe.dev
-    mode: passthrough
-    target: 192.168.1.100:443
