@@ -18,7 +18,8 @@ params:
   gate:
     prod:
       user: darthvader
-      password: {type: secret}
+      password: 
+        type: secret
   # ids the linuxserver images run as; must be able to write the NAS shares
   ids:
     prod:
@@ -26,12 +27,18 @@ params:
       pgid: "1000"             # the media group on TrueNAS, owns tank/media and tank/downloads
   keys:
     prod:
-      sonarr: {type: secret}
-      radarr: {type: secret}
-      prowlarr: {type: secret}
-      bazarr: {type: secret}
-      rdt_user: {type: secret}
-      rdt_pass: {type: secret}
+      sonarr: 
+        type: secret
+      radarr: 
+        type: secret
+      prowlarr: 
+        type: secret
+      bazarr: 
+        type: secret
+      rdt_user: 
+        type: secret
+      rdt_pass:
+        type: secret
 
 volumes:
   jellyfin-config: {}
