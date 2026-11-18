@@ -45,6 +45,7 @@ base:
       user: "3000:3000"
       depends_on:
         - redis
+        - immich-machine-learning   # the server calls it by name; this also draws the line on the canvas
       env:
         TZ: Europe/London
         DB_URL: ${{ tile.immich-db.url }}
