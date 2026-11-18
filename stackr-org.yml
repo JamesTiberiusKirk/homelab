@@ -27,3 +27,5 @@ stacks:
     path: stacks/media/stackr-compose.yml
   auth:
     path: stacks/auth/stackr-compose.yml
+  dashy:
+    path: stacks/dashy/stackr-compose.yml

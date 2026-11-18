@@ -88,6 +88,29 @@ identity_providers:
     lifespans:
       refresh_token: '90d'
     clients:
+      # Dashy dashboard. Public client (PKCE): Dashy's OIDC config takes no secret.
+      # The groups scope is what lets Dashy hide admin-only tiles.
+      - client_id: dashy
+        client_name: Dashy
+        public: true
+        authorization_policy: one_factor
+        require_pkce: true
+        pkce_challenge_method: S256
+        redirect_uris:
+          - 'https://dashy.{{ env "BASE_DOMAIN" }}'
+        scopes:
+          - openid
+          - profile
+          - email
+          - groups
+        response_types:
+          - code
+        grant_types:
+          - authorization_code
+        access_token_signed_response_alg: none
+        userinfo_signed_response_alg: none
+        token_endpoint_auth_method: none
+
       - client_id: immich
         client_name: Immich
         client_secret: '{{ env "IMMICH_OIDC_CLIENT_SECRET_HASH" }}'

@@ -1,0 +1,25 @@
+version: 1
+stack: dashy
+
+environments:
+  prod:
+    branch: master
+    auto: false
+
+# Ported from serverconfig/stacks/dashy/docker-compose.yml.
+# The dashboard at dashy.vulpe.dev, where Authelia sends you after a sign-in.
+# No login in front: Dashy signs in through Authelia itself (OIDC client
+# "dashy" in stacks/auth/authelia.yml) and hides the admin sections by group.
+
+base:
+  tiles:
+    dashy:
+      image: lissy93/dashy:latest
+      port: 8080
+      env:
+        NODE_ENV: production
+      files:
+        # Dashy does not fill in variables in this file: the domain is written out in it.
+        - stacks/dashy/conf.yml:/app/user-data/conf.yml
+      domains:
+        - host: dashy.vulpe.dev
