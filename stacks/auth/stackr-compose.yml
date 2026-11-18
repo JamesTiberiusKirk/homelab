@@ -1,0 +1,94 @@
+version: 1
+stack: auth
+
+environments:
+  prod:
+    branch: master
+    auto: false
+
+# Ported from serverconfig/stacks/auth/docker-compose.yml.
+# Tile names equal the old container names: Authelia reaches the user
+# directory at ldap://lldap:3890.
+
+params:
+  # all set by scripts/auth-secrets.sh from the old .env
+  auth:
+    prod:
+      lldap_jwt_secret:
+        type: secret
+      lldap_key_seed:
+        type: secret
+      lldap_base_dn:
+        type: secret
+      lldap_admin_email:
+        type: secret
+      lldap_admin_password:
+        type: secret
+      authelia_session_secret:
+        type: secret
+      authelia_storage_encryption_key:
+        type: secret
+      authelia_jwt_secret:
+        type: secret
+      authelia_oidc_hmac_secret:
+        type: secret
+      immich_oidc_client_secret_hash:
+        type: secret
+      huginn_oidc_client_secret_hash:
+        type: secret
+      rustfs_oidc_client_secret_hash:
+        type: secret
+
+volumes:
+  lldap-data: {}
+  authelia-data: {}       # login database and the OIDC signing key (oidc-private.pem)
+
+base:
+  tiles:
+    # The user directory. Its admin page has its own login.
+    lldap:
+      image: lldap/lldap:stable
+      port: 17170
+      healthcheck: /app/lldap healthcheck
+      env:
+        TZ: Europe/London
+        LLDAP_JWT_SECRET: ${{ params.auth.lldap_jwt_secret }}
+        LLDAP_KEY_SEED: ${{ params.auth.lldap_key_seed }}
+        LLDAP_LDAP_BASE_DN: ${{ params.auth.lldap_base_dn }}
+        LLDAP_LDAP_USER_DN: admin
+        LLDAP_LDAP_USER_EMAIL: ${{ params.auth.lldap_admin_email }}
+        LLDAP_LDAP_USER_PASS: ${{ params.auth.lldap_admin_password }}
+        LLDAP_HTTP_URL: https://lldap.vulpe.dev
+      volumes:
+        - lldap-data:/data
+      domains:
+        - host: lldap.vulpe.dev
+
+    # The login page and OIDC provider.
+    authelia:
+      image: authelia/authelia:4.38
+      port: 9091
+      user: "1000:1000"
+      depends_on:
+        - lldap
+      env:
+        TZ: Europe/London
+        # Authelia fills in the {{ env "..." }} parts of its config itself,
+        # so the file is mounted as it is, not as a stackr template.
+        X_AUTHELIA_CONFIG_FILTERS: template
+        BASE_DOMAIN: vulpe.dev
+        LLDAP_BASE_DN: ${{ params.auth.lldap_base_dn }}
+        AUTHELIA_SESSION_SECRET: ${{ params.auth.authelia_session_secret }}
+        AUTHELIA_STORAGE_ENCRYPTION_KEY: ${{ params.auth.authelia_storage_encryption_key }}
+        AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET: ${{ params.auth.authelia_jwt_secret }}
+        AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD: ${{ params.auth.lldap_admin_password }}
+        AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET: ${{ params.auth.authelia_oidc_hmac_secret }}
+        IMMICH_OIDC_CLIENT_SECRET_HASH: ${{ params.auth.immich_oidc_client_secret_hash }}
+        HUGINN_OIDC_CLIENT_SECRET_HASH: ${{ params.auth.huginn_oidc_client_secret_hash }}
+        RUSTFS_OIDC_CLIENT_SECRET_HASH: ${{ params.auth.rustfs_oidc_client_secret_hash }}
+      files:
+        - stacks/auth/authelia.yml:/config/configuration.yml
+      volumes:
+        - authelia-data:/data
+      domains:
+        - host: auth.vulpe.dev

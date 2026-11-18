@@ -25,3 +25,5 @@ stacks:
     path: stacks/infra/stackr-compose.yml
   media:
     path: stacks/media/stackr-compose.yml
+  auth:
+    path: stacks/auth/stackr-compose.yml
