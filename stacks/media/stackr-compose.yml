@@ -76,6 +76,11 @@ base:
         PUID: ${{ params.ids.puid }}
         PGID: ${{ params.ids.pgid }}
         TZ: Europe/London
+        # Authelia is the login in front, so the arr tools' own sign-in page is
+        # off ("External"). Each tool reads only its own line.
+        PROWLARR__AUTH__METHOD: External
+        SONARR__AUTH__METHOD: External
+        RADARR__AUTH__METHOD: External
       volumes:
         - prowlarr-config:/config
       domains:
