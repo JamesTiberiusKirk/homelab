@@ -14,7 +14,8 @@ environments:
 # settings reach each other by those names (http://sonarr:8989 and so on).
 
 params:
-  # the password gate in front of the five tools (was Authelia)
+  # the old password gate. Not used since the tools went behind Authelia;
+  # kept until that is proven, then this block and its secret can go.
   gate:
     prod:
       user: darthvader
@@ -79,10 +80,11 @@ base:
         - prowlarr-config:/config
       domains:
         - host: prowlarr.vulpe.dev
-          proxy: &gate
-            basic_auth:
-              user: ${{ params.gate.user }}
-              password: ${{ params.gate.password }}
+          # Login through Authelia (stacks/auth), as on the old Traefik. The URL is
+          # Authelia's public address: stackr cannot point forward auth at a tile.
+          proxy: &sso
+            forward_auth:
+              url: https://auth.vulpe.dev/api/authz/forward-auth
 
     sonarr:
       image: lscr.io/linuxserver/sonarr:latest
@@ -94,7 +96,7 @@ base:
         - share:downloads:/downloads
       domains:
         - host: sonarr.vulpe.dev
-          proxy: *gate
+          proxy: *sso
 
     radarr:
       image: lscr.io/linuxserver/radarr:latest
@@ -106,7 +108,7 @@ base:
         - share:downloads:/downloads
       domains:
         - host: radarr.vulpe.dev
-          proxy: *gate
+          proxy: *sso
 
     bazarr:
       image: lscr.io/linuxserver/bazarr:latest
@@ -117,7 +119,7 @@ base:
         - share:media:/media
       domains:
         - host: bazarr.vulpe.dev
-          proxy: *gate
+          proxy: *sso
 
     flaresolverr:
       image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -134,7 +136,7 @@ base:
         - share:downloads:/data/downloads
       domains:
         - host: rdt.vulpe.dev
-          proxy: *gate
+          proxy: *sso
 
     # Zilean's database on the shared Postgres 18 (was its own postgres:17).
     # Starts empty: Zilean downloads its index again.
