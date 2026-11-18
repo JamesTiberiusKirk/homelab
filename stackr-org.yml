@@ -18,6 +18,11 @@ shares:
     kind: nfs
     source: 192.168.1.102:/mnt/tank/downloads
     options: nfsvers=4.2   # NFS 3 needs helper services on the node that it does not run
+  # App data: one dataset per app under tank/apps on TrueNAS.
+  photos:
+    kind: nfs
+    source: 192.168.1.102:/mnt/tank/apps/immich
+    options: nfsvers=4.2
 
 # One file per stack, all in this repo.
 stacks:
@@ -29,3 +34,5 @@ stacks:
     path: stacks/auth/stackr-compose.yml
   dashy:
     path: stacks/dashy/stackr-compose.yml
+  immich:
+    path: stacks/immich/stackr-compose.yml

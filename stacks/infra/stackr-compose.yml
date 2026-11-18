@@ -17,5 +17,16 @@ base:
       engine: postgres
       major: 18
       pitr_days: 7
+      # What slices may ask for. vchord comes from a stackr recipe (and loads
+      # at start by itself); the rest ship with the official image.
+      # All of them are what Immich's database uses.
+      extensions:
+        - vchord
+        - vector
+        - cube
+        - earthdistance
+        - pg_trgm
+        - unaccent
+        - uuid-ossp
       allow:
         - homelab:*            # any stack of this org may cut a slice

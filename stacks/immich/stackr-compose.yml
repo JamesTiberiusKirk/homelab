@@ -1,0 +1,55 @@
+version: 1
+stack: immich
+
+environments:
+  prod:
+    branch: master
+    auto: false
+
+# Ported from serverconfig/stacks/immich/docker-compose.yml.
+# Tile names equal the old service names: Immich's saved settings point at
+# http://immich-machine-learning:3003, and the server finds redis by name.
+# Sign-in is Immich's own, through Authelia (OIDC client "immich").
+
+volumes:
+  model-cache: {}              # machine learning models; they download again
+
+base:
+  tiles:
+    # Immich's database on the shared Postgres 18 (was its own postgres:14).
+    # stackr creates the extensions as the superuser; Immich is not one.
+    immich-db:
+      type: slice
+      provision_from: infra:prod:pg
+      extensions:
+        - vchord
+        - vector
+        - cube
+        - earthdistance
+        - pg_trgm
+        - unaccent
+        - uuid-ossp
+
+    redis:
+      image: docker.io/valkey/valkey:8-bookworm
+
+    immich-machine-learning:
+      image: ghcr.io/immich-app/immich-machine-learning:v3.4.1
+      volumes:
+        - model-cache:/cache
+
+    immich-server:
+      image: ghcr.io/immich-app/immich-server:v3.4.1
+      port: 2283
+      # darthvader on TrueNAS, the owner of tank/apps/immich
+      user: "3000:3000"
+      depends_on:
+        - redis
+      env:
+        TZ: Europe/London
+        DB_URL: ${{ tile.immich-db.url }}
+        REDIS_HOSTNAME: redis
+      volumes:
+        - share:photos:/data
+      domains:
+        - host: pics.vulpe.dev         # no gate: Immich has its own login
