@@ -4,9 +4,8 @@ org: homelab
 # Where the org's envs run unless a stack says otherwise.
 pin: media                     # the placement on home-ct
 
-# The old addresses stay: apps keep their vulpe.dev names.
-domains:
-  - host: vulpe.dev
+# vulpe.dev is a server-level domain, managed through the server's
+# Namecheap connector. It is not declared here.
 
 # NAS exports the tiles mount. TrueNAS allows the home node (192.168.1.104).
 shares:
