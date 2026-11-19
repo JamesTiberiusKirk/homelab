@@ -11,7 +11,7 @@ environments:
 # directory at ldap://lldap:3890.
 
 params:
-  # all set by scripts/auth-secrets.sh from the old .env
+  # values come from the old .env, set once on prod
   auth:
     prod:
       lldap_jwt_secret:

@@ -41,3 +41,5 @@ stacks:
     repo: FyrmForge/huginn
     branch: master
     path: stackr-compose.yml
+    # The server connector for the FyrmForge GitHub account.
+    connector: FyrmForge GitHub
