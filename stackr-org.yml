@@ -24,7 +24,7 @@ shares:
     source: 192.168.1.102:/mnt/tank/apps/immich
     options: nfsvers=4.2
 
-# One file per stack, all in this repo.
+# One file per stack. In this repo unless the entry names another.
 stacks:
   infra:
     path: stacks/infra/stackr-compose.yml
@@ -36,3 +36,8 @@ stacks:
     path: stacks/dashy/stackr-compose.yml
   immich:
     path: stacks/immich/stackr-compose.yml
+  # Huginn keeps its stack file in its own repo, next to the code it builds.
+  huginn:
+    repo: FyrmForge/huginn
+    branch: master
+    path: stackr-compose.yml
