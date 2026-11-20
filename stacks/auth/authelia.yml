@@ -94,6 +94,7 @@ identity_providers:
         client_name: Dashy
         public: true
         authorization_policy: one_factor
+        consent_mode: implicit
         require_pkce: true
         pkce_challenge_method: S256
         redirect_uris:
@@ -116,6 +117,7 @@ identity_providers:
         client_secret: '{{ env "IMMICH_OIDC_CLIENT_SECRET_HASH" }}'
         public: false
         authorization_policy: one_factor
+        consent_mode: implicit
         redirect_uris:
           - 'https://pics.{{ env "BASE_DOMAIN" }}/auth/login'
           - 'https://pics.{{ env "BASE_DOMAIN" }}/user-settings'
@@ -133,6 +135,7 @@ identity_providers:
         client_secret: '{{ env "HUGINN_OIDC_CLIENT_SECRET_HASH" }}'
         public: false
         authorization_policy: one_factor
+        consent_mode: implicit
         redirect_uris:
           - 'https://huginn.{{ env "BASE_DOMAIN" }}/auth/oidc/callback'
         scopes:
@@ -150,6 +153,7 @@ identity_providers:
         client_secret: '{{ env "RUSTFS_OIDC_CLIENT_SECRET_HASH" }}'
         public: false
         authorization_policy: one_factor
+        consent_mode: implicit
         require_pkce: true
         pkce_challenge_method: S256
         redirect_uris:
